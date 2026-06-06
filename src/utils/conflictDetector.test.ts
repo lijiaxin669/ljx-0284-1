@@ -174,6 +174,50 @@ describe('conflictDetector', () => {
       const conflicts = checkVenueAvailability(baseShow, venues)
       expect(conflicts).toHaveLength(0)
     })
+
+    it('should use local date for venue availability check, not UTC', () => {
+      const midnightShow: Show = {
+        ...baseShow,
+        id: 'show_midnight',
+        venueId: 'venue4',
+        startTime: '2024-06-21T02:00:00'
+      }
+
+      const venues: Venue[] = [
+        {
+          id: 'venue4',
+          name: '深圳湾体育中心',
+          city: '深圳',
+          unavailableDates: ['2024-06-21']
+        }
+      ]
+
+      const conflicts = checkVenueAvailability(midnightShow, venues)
+      expect(conflicts).toHaveLength(1)
+      expect(conflicts[0].message).toContain('2024-06-21')
+    })
+
+    it('should handle late night shows correctly with local date', () => {
+      const lateNightShow: Show = {
+        ...baseShow,
+        id: 'show_late',
+        venueId: 'venue4',
+        startTime: '2024-06-21T23:30:00'
+      }
+
+      const venues: Venue[] = [
+        {
+          id: 'venue4',
+          name: '深圳湾体育中心',
+          city: '深圳',
+          unavailableDates: ['2024-06-21']
+        }
+      ]
+
+      const conflicts = checkVenueAvailability(lateNightShow, venues)
+      expect(conflicts).toHaveLength(1)
+      expect(conflicts[0].message).toContain('2024-06-21')
+    })
   })
 
   describe('detectConflicts', () => {

@@ -138,8 +138,9 @@ export const useTourStore = defineStore('tour', () => {
           if (data.viewMode) {
             viewMode.value = data.viewMode
           }
-          
-          if (shows.value.length > 0) {
+          if (data.viewStartDate) {
+            viewStartDate.value = new Date(data.viewStartDate)
+          } else if (shows.value.length > 0) {
             const sortedShows = [...shows.value].sort((a, b) => 
               new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
             )
